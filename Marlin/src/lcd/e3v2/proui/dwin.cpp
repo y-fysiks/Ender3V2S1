@@ -809,7 +809,9 @@ bool DWIN_lcd_sd_status = false;
   }
 #endif
 
-void setMediaAutoMount() { toggleCheckboxLine(hmiData.mediaAutoMount); }
+#if DISABLED(HAS_SD_EXTENDER)
+  void setMediaAutoMount() { toggleCheckboxLine(hmiData.mediaAutoMount); }
+#endif
 
 inline uint16_t nr_sd_menu_items() {
   return _MIN(card.get_num_items() + !card.flag.workDirIsRoot, MENU_MAX_ITEMS);
@@ -1075,7 +1077,7 @@ void hmiMainMenu() {
   else if (encoder_diffState == ENCODER_DIFF_ENTER) {
     switch (select_page.now) {
       case PAGE_PRINT:
-        if (hmiData.mediaAutoMount) {
+        if (ENABLED(HAS_SD_EXTENDER) || hmiData.mediaAutoMount) {
           card.mount();
           safe_delay(800);
         };
@@ -2784,7 +2786,9 @@ void drawAdvancedSettingsMenu() {
     #if ENABLED(MEDIASORT_MENU_ITEM)
       EDIT_ITEM(ICON_File, MSG_MEDIA_SORT, onDrawChkbMenu, setMediaSort, &hmiData.mediaSort);
     #endif
-    EDIT_ITEM(ICON_File, MSG_MEDIA_UPDATE, onDrawChkbMenu, setMediaAutoMount, &hmiData.mediaAutoMount);
+    #if DISABLED(HAS_SD_EXTENDER)
+      EDIT_ITEM(ICON_File, MSG_MEDIA_UPDATE, onDrawChkbMenu, setMediaAutoMount, &hmiData.mediaAutoMount);
+    #endif
     #if ENABLED(BAUD_RATE_GCODE)
       EDIT_ITEM_F(ICON_SetBaudRate, "115K baud", onDrawChkbMenu, setBaudRate, &hmiData.baud115K);
     #endif
